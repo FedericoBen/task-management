@@ -1,0 +1,33 @@
+.container_input {
+  display: flex;
+  align-items: center;
+  padding: 4px 7px;
+  width: 100%;
+  position: relative;
+  cursor: text;
+
+  & .placeholder {
+    position: absolute;
+    color: #ffffff;
+    font-size: 16px;
+    transition: top, font-size 0.3s ease;
+  }
+
+  & input {
+    width: 100%;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #ffffff;
+
+    &:hover{
+        border-bottom: 1px solid #d3edf9;
+    }
+
+    &:focus{
+        border-bottom: 2px solid #d3edf9;
+    }
+  }
+}

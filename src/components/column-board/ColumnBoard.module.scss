@@ -1,0 +1,68 @@
+.container_colum {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border: 3px dashed #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  height: max-content;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: hidden;
+  padding: 20px;
+  position: relative;
+
+  & .container_header {
+    & * {
+      color: #ffffff;
+    }
+    & .title {
+      background-color: #4d869c;
+      mask-image: linear-gradient(black 60%, transparent);
+      min-height: 40px;
+    }
+
+    & .button_task {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      gap: 8px;
+      width: max-content;
+    }
+  }
+
+  & .container_cards {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+    padding-inline: 12px;
+
+    & .form_card {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      background-color: #7ab2b2;
+      min-height: 160px;
+      border-radius: 8px;
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      position: relative;
+      padding: 12px;
+      & * {
+        color: #ffffff;
+      }
+    }
+  }
+  & .button {
+    cursor: pointer;
+    padding: 4px;
+  }
+  & .button_close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}

@@ -1,0 +1,24 @@
+.drop_area {
+  color: #ffffff;
+  background-color: transparent;
+  border: 2px dashed #ffffff;
+  opacity: 0.5;
+  min-height: 120px;
+  margin-block: 8px;
+  padding: 20px;
+  width: 100%;
+  cursor: grabbing !important;
+}
+
+.hide_drop {
+  min-height: 50px !important;
+  opacity: 0 !important;
+}
+
+.drop_area_full {
+  height: 100%;
+}
+
+.drop{
+  transition: min-height 0.3s ease;
+}

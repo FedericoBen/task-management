@@ -1,0 +1,47 @@
+.container_board {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+
+  & .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+
+    & * {
+      color: #ffffff;
+    }
+  }
+
+  & .container_columns {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.form_add_column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  & h3 {
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  button {
+    max-width: 400px;
+  }
+}
+
+.stop_delete_colum > * {
+  color: #ffffff;
+}

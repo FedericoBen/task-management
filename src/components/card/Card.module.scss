@@ -1,0 +1,41 @@
+.container_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #7ab2b2;
+  min-height: 120px;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  position: relative;
+  cursor: grab;
+  padding: 20px 16px;
+
+  & * {
+    color: #ffffff;
+  }
+
+  & .header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    gap: 12px;
+  }
+
+  & .description {
+    display: flex;
+    width: 100%;
+  }
+}
+
+.drag_on {
+  background-color: #8decb4;
+}
+
+.button {
+  cursor: pointer;
+  padding: 4px;
+  & * {
+    color: #ffffff;
+  }
+}
