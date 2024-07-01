@@ -16,6 +16,11 @@ const Input = forwardRef(function (
     }
   };
 
+  const verifyEventChange = (e) => {
+    if (e.target.value) return setActive(true);
+    setActive(false)
+  };
+
   const stylesActive = useMemo(
     () => ({
       top: `${active ? -16 : 4}px`,
@@ -46,7 +51,9 @@ const Input = forwardRef(function (
         type="text"
         name={name}
         value={value}
-        onChange={onChange}
+        onChange={(e) => {
+          onChange(e), verifyEventChange(e);
+        }}
         ref={(input) => {
           if (typeof ref === "function") ref?.(input);
           else if (ref) {

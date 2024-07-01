@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import styles from "./ColumnBoard.module.scss";
 import Card from "../card/Card";
 
@@ -10,7 +10,8 @@ import Input from "../input/Input";
 import DropArea from "../drop-area/DropArea";
 
 const ColumnBoard = ({
-  column,
+  columnId,
+  columnName,
   listCards = [],
   onDrop,
   setActiveCard,
@@ -26,20 +27,24 @@ const ColumnBoard = ({
   const handlerAddTask = (e) => {
     e.preventDefault();
     if (!addTaskInput.current) return;
-    addTask(addTaskInput.current.value, column);
+    addTask(addTaskInput.current.value, columnId);
     addTaskInput.current.value = "";
     setActiveAddTask(false);
   };
+  useEffect(() => {
+    if (activeAddTask) addTaskInput.current.focus();
+  }, [activeAddTask]);
+
   return (
     <div className={styles.container_colum}>
       <div className={styles.container_header}>
         <div
           className={`${styles.button} ${styles.button_close}`}
-          onClick={() => deleteColumn(column)}
+          onClick={() => deleteColumn(columnId)}
         >
           <FaRegTrashCan size={24} />
         </div>
-        <h3 className={styles.title}>{column}</h3>
+        <h3 className={styles.title}>{columnName}</h3>
         {!activeAddTask && (
           <div
             className={styles.button_task}
@@ -67,13 +72,13 @@ const ColumnBoard = ({
         )}
         <DropArea
           areaFull={listCards.length == 0}
-          onDrop={() => onDrop(column, 0)}
+          onDrop={() => onDrop(columnId, 0)}
         />
         {listCards.map((card, i) => (
           <Fragment key={`${card.id}-${i}`}>
             <Card
               editCard={() => editCard(card)}
-              deleteCard={() => deleteCard(column, card)}
+              deleteCard={() => deleteCard(columnId, card)}
               card={card}
               setActiveCard={(card) => {
                 setActiveCard(card);
@@ -81,7 +86,7 @@ const ColumnBoard = ({
             />
             <DropArea
               areaFull={i == listCards.length - 1}
-              onDrop={() => onDrop(column, i + 1)}
+              onDrop={() => onDrop(columnId, i + 1)}
             />
           </Fragment>
         ))}

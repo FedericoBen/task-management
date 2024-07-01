@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ColumnBoard from "../column-board/ColumnBoard";
 import styles from "./Board.module.scss";
 import Modal from "../modal/Modal";
@@ -15,22 +15,22 @@ const Board = () => {
 
   const onDrop = (column, newPosition) => {
     if (!activeCard) return;
-    const cardToMove = board[activeCard.column].find(
+    const cardToMove = board[activeCard.column].cards.find(
       (card) => card.id == activeCard.id
     );
 
     if (
       newPosition != 0 &&
-      board[cardToMove.column][newPosition - 1]?.id == cardToMove.id &&
-      board[cardToMove.column][newPosition - 1]?.column == column
+      board[cardToMove.column].cards[newPosition - 1]?.id == cardToMove.id &&
+      board[cardToMove.column].cards[newPosition - 1]?.column == column
     ) {
       return;
     }
     let newBoard = { ...board };
-    newBoard[cardToMove.column] = newBoard[cardToMove.column].filter(
-      (card) => card.id != activeCard.id
-    );
-    newBoard[column].splice(newPosition, 0, {
+    newBoard[cardToMove.column].cards = newBoard[
+      cardToMove.column
+    ].cards.filter((card) => card.id != activeCard.id);
+    newBoard[column].cards.splice(newPosition, 0, {
       ...cardToMove,
       column,
     });
@@ -41,23 +41,27 @@ const Board = () => {
     e.preventDefault();
     const value = inputRef.current.value;
     if (board[value] || !value) return;
-    setBoard({ ...board, [value]: [] });
+    setBoard({ ...board, [crypto.randomUUID()]: { name: value, cards: [] } });
     setActionModal(null);
   };
 
   const addTask = (value, column) => {
-    if(!value) return
+    if (!value) return;
+    const { name, cards } = board[column];
     setBoard({
       ...board,
-      [column]: [
-        ...board[column],
-        {
-          column: column,
-          createAt: new Date(),
-          id: `${value}-${board[column].length + 1}`,
-          value,
-        },
-      ],
+      [column]: {
+        name,
+        cards: [
+          {
+            column: column,
+            createAt: new Date(),
+            id: crypto.randomUUID(),
+            value,
+          },
+          ...cards,
+        ],
+      },
     });
   };
 
@@ -69,28 +73,35 @@ const Board = () => {
     e.preventDefault();
     if (!inputRef.current.value) return setActionModal(null);
 
-    const { column, id, value } = activeCard;
+    const { column, id } = activeCard;
+    const { cards, name } = board[column];
     const newBoard = {
       ...board,
-      [column]: board[column].map((card) => ({
-        ...card,
-        value: card.id == id ? inputRef.current.value : card.value,
-      })),
-      };
+      [column]: {
+        name,
+        cards: cards.map((card) => ({
+          ...card,
+          value: card.id == id ? inputRef.current.value : card.value,
+        })),
+      },
+    };
     setBoard(newBoard);
     setActionModal(null);
   };
 
-
   const deleteCard = (column, cardToDelete) => {
+    const { cards, name } = board[column];
     setBoard({
       ...board,
-      [column]: board[column].filter((card) => card.id != cardToDelete.id),
+      [column]: {
+        name,
+        cards: cards.filter((card) => card.id != cardToDelete.id),
+      },
     });
   };
 
   const deleteColumn = (column) => {
-    if (board[column].length > 0)
+    if (board[column].cards.length > 0)
       return setActionModal(ACTION_MODAL.STOP_DELETE_COLUMN);
     let newBoard = {};
     for (const key of Object.keys(board)) {
@@ -131,6 +142,11 @@ const Board = () => {
     ),
   };
 
+  useEffect(() => {
+    if (!actionModal) return;
+    inputRef.current?.focus();
+  }, [actionModal]);
+
   return (
     <>
       {actionModal && (
@@ -148,18 +164,19 @@ const Board = () => {
         </div>
         <div className={styles.container_columns}>
           {Object.keys(board).map((column) => {
-            const id = column;
+            const key = column;
             return (
               <ColumnBoard
                 deleteCard={deleteCard}
                 deleteColumn={deleteColumn}
                 editCard={preparedModalToUpdate}
                 addTask={addTask}
-                key={id}
-                column={id}
+                key={key}
+                columnName={board[key].name}
+                columnId={key}
                 activeCard={activeCard}
                 setActiveCard={setActiveCard}
-                listCards={board[id]}
+                listCards={board[key].cards}
                 onDrop={onDrop}
               />
             );
