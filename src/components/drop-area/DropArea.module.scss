@@ -7,13 +7,12 @@
   margin-block: 8px;
   padding: 20px;
   width: 100%;
-  cursor: grabbing !important;
 }
 
 .hide_drop {
-  min-height: 32px !important;
+  min-height: 52px !important;
   opacity: 0 !important;
-  transition: none !important;
+  transition: min-height 0.3s ease, opacity 0.3 ease;
 }
 
 .drop_area_full {

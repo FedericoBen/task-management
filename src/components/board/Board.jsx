@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ColumnBoard from "../column-board/ColumnBoard";
 import styles from "./Board.module.scss";
 import Modal from "../modal/Modal";
@@ -8,16 +8,24 @@ import Button from "../button/Button";
 
 const Board = () => {
   const inputRef = useRef(null);
-  const [activeCard, setActiveCard] = useState(null);
   const [actionModal, setActionModal] = useState(null);
+  const [movingCard, setMovingCard] = useState(null);
 
   const [board, setBoard] = useState({});
 
   const onDrop = (column, newPosition) => {
-    if (!activeCard) return;
-    const cardToMove = board[activeCard.column].cards.find(
-      (card) => card.id == activeCard.id
-    );
+    if (!movingCard) return;
+
+    let cardToMove = null;
+
+    const columnsBoard = Object.keys(board);
+
+    columnsBoard.forEach((col) => {
+      const cardToFind = board[col].cards.find(
+        (card) => card.id == movingCard?.id
+      );
+      if (cardToFind) cardToMove = cardToFind;
+    });
 
     if (
       newPosition != 0 &&
@@ -26,15 +34,22 @@ const Board = () => {
     ) {
       return;
     }
-    let newBoard = { ...board };
-    newBoard[cardToMove.column].cards = newBoard[
-      cardToMove.column
-    ].cards.filter((card) => card.id != activeCard.id);
-    newBoard[column].cards.splice(newPosition, 0, {
+
+    let newBoard = structuredClone(board);
+
+    const boardFilter = newBoard[cardToMove.column].cards.filter(
+      (card) => card.id != movingCard?.id
+    );
+
+    newBoard[cardToMove.column].cards = boardFilter;
+
+    newBoard[column].cards = newBoard[column].cards.toSpliced(newPosition, 0, {
       ...cardToMove,
       column,
     });
+
     setBoard(newBoard);
+    setMovingCard(null);
   };
 
   const addColumn = (e) => {
@@ -142,6 +157,109 @@ const Board = () => {
     ),
   };
 
+  //*Event mobile
+  const startTouche = (e, card) => {
+    const touchPoint = {
+      x: e.touches?.[0].clientX,
+      y: e.touches?.[0].clientY,
+    };
+
+    setMovingCard({
+      ...card,
+      drop: false,
+      style: {
+        position: "fixed",
+        top: `${touchPoint.y}px`,
+        left: `${touchPoint.x - 50}px`,
+      },
+    });
+  };
+
+  const moveTouche = (e) => {
+    if (!e?.touches?.[0] || !movingCard) return;
+    const touchPoint = {
+      x: e.touches?.[0].clientX,
+      y: e.touches?.[0].clientY,
+    };
+    const elementUnderTouch = document.elementFromPoint(
+      touchPoint.x - 50,
+      touchPoint.y
+    );
+    window.scroll({
+      top: touchPoint.y,
+      left: 0,
+      behavior: "smooth",
+    });
+
+    setMovingCard({
+      ...movingCard,
+      elementBelow: elementUnderTouch?.id,
+      style: {
+        position: "fixed",
+        top: `${touchPoint.y}px`,
+        left: `${touchPoint.x - 50}px`,
+      },
+    });
+  };
+  const endTouche = useCallback(() => {
+    if (!movingCard?.id) return;
+    setMovingCard({
+      ...movingCard,
+      style: null,
+      drop: true,
+    });
+  }, [movingCard]);
+
+  //*Event desktop
+
+  const onMouseDown = (e, card) => {
+    const touchPoint = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+
+    setMovingCard({
+      ...card,
+      drop: false,
+      style: {
+        position: "fixed",
+        top: `${touchPoint.y - 80}px`,
+        left: `${touchPoint.x - 50}px`,
+      },
+    });
+  };
+
+  const onMouseMove = (e) => {
+    if (!movingCard) return;
+    const positionMouse = {
+      x: e.clientX,
+      y: e.clientY,
+    };
+
+    const elementUnderTouch = document.elementFromPoint(
+      positionMouse.x - 150,
+      positionMouse.y - 90
+    );
+
+    setMovingCard({
+      ...movingCard,
+      elementBelow: elementUnderTouch?.id,
+      style: {
+        position: "fixed",
+        top: `${positionMouse.y - 80}px`,
+        left: `${positionMouse.x - 165}px`,
+      },
+    });
+  };
+  const onMouseUp = () => {
+    if (!movingCard) return;
+    setMovingCard({
+      ...movingCard,
+      style: null,
+      drop: true,
+    });
+  };
+
   useEffect(() => {
     if (!actionModal) return;
     inputRef.current?.focus();
@@ -167,6 +285,12 @@ const Board = () => {
             const key = column;
             return (
               <ColumnBoard
+                startTouche={startTouche}
+                moveTouche={moveTouche}
+                endTouche={endTouche}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
                 deleteCard={deleteCard}
                 deleteColumn={deleteColumn}
                 editCard={preparedModalToUpdate}
@@ -174,10 +298,9 @@ const Board = () => {
                 key={key}
                 columnName={board[key].name}
                 columnId={key}
-                activeCard={activeCard}
-                setActiveCard={setActiveCard}
                 listCards={board[key].cards}
                 onDrop={onDrop}
+                movingCard={movingCard}
               />
             );
           })}

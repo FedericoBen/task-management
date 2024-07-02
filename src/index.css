@@ -65,3 +65,7 @@ h1 {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+*::selection {
+  background: transparent;
+}

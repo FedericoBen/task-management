@@ -1,22 +1,14 @@
-import { useState } from "react";
 import styles from "./Card.module.scss";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { RiEdit2Line } from "react-icons/ri";
 
-const Card = ({ card, setActiveCard, deleteCard, editCard }) => {
-  const [isDrop, setIsDrop] = useState(false);
+const Card = ({ style, card, deleteCard, editCard, ...resProps }) => {
   return (
     <article
-      className={`${styles.container_card} ${isDrop && styles.drag_on}`}
-      draggable
-      onDragStart={() => {
-        setIsDrop(true);
-        setActiveCard(card);
-      }}
-      onDragEnd={() => {
-        setIsDrop(false);
-        setActiveCard(null);
-      }}
+      
+      style={{ ...(style ?? {}) }}
+      id={`card-${card.id}`}
+      className={`${styles.container_card} ${style && styles.drag_on}`}
     >
       <div className={styles.header}>
         <div className={`${styles.button}`} onClick={deleteCard}>
@@ -26,7 +18,7 @@ const Card = ({ card, setActiveCard, deleteCard, editCard }) => {
           <RiEdit2Line size={20} />
         </div>
       </div>
-      <div className={styles.description}>{card.value}</div>
+      <div {...resProps} className={styles.description}>{card.value}</div>
     </article>
   );
 };

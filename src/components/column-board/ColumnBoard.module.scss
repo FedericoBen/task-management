@@ -4,9 +4,9 @@
   justify-content: flex-start;
   border: 3px dashed #ffffff;
   border-radius: 8px;
-  width: 100%;
+
   height: max-content;
-  max-width: 400px;
+  width: 400px;
   max-height: 80vh;
   overflow-y: hidden;
   padding: 20px;
@@ -38,7 +38,7 @@
     flex-direction: column;
     overflow-y: auto;
     height: 100%;
-    padding-inline: 12px;
+    padding-inline: 4px;
 
     & .form_card {
       display: flex;

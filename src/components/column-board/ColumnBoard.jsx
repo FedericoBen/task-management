@@ -10,15 +10,23 @@ import Input from "../input/Input";
 import DropArea from "../drop-area/DropArea";
 
 const ColumnBoard = ({
+  startTouche,
+  moveTouche,
+  endTouche,
+
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
+
   columnId,
   columnName,
   listCards = [],
   onDrop,
-  setActiveCard,
   deleteColumn,
   deleteCard,
   editCard,
   addTask,
+  movingCard,
 }) => {
   const addTaskInput = useRef(null);
 
@@ -31,6 +39,7 @@ const ColumnBoard = ({
     addTaskInput.current.value = "";
     setActiveAddTask(false);
   };
+
   useEffect(() => {
     if (activeAddTask) addTaskInput.current.focus();
   }, [activeAddTask]);
@@ -55,7 +64,7 @@ const ColumnBoard = ({
           </div>
         )}
       </div>
-      <div className={styles.container_cards}>
+      <div className={styles.container_cards} id={`column-${columnId}`}>
         {activeAddTask && (
           <form onSubmit={handlerAddTask} className={styles.form_card}>
             <Input ref={addTaskInput} />
@@ -71,23 +80,40 @@ const ColumnBoard = ({
           </form>
         )}
         <DropArea
+          id={`${columnId}-0`}
+          over={movingCard?.elementBelow == `${columnId}-0`}
+          activeDrop={
+            movingCard?.elementBelow == `${columnId}-0` && movingCard.drop
+          }
           areaFull={listCards.length == 0}
           onDrop={() => onDrop(columnId, 0)}
         />
         {listCards.map((card, i) => (
           <Fragment key={`${card.id}-${i}`}>
             <Card
+              onTouchStart={(e) => startTouche(e, card)}
+              onTouchMove={moveTouche}
+              onTouchEnd={endTouche}
+              onMouseDown={(e) => onMouseDown(e, card)}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              style={card.id == movingCard?.id ? movingCard.style : undefined}
               editCard={() => editCard(card)}
               deleteCard={() => deleteCard(columnId, card)}
               card={card}
-              setActiveCard={(card) => {
-                setActiveCard(card);
-              }}
             />
-            <DropArea
-              areaFull={i == listCards.length - 1}
-              onDrop={() => onDrop(columnId, i + 1)}
-            />
+            {movingCard?.id != card.id  && (
+              <DropArea
+                id={`${columnId}-${i + 1}`}
+                over={movingCard?.elementBelow == `${columnId}-${i + 1}`}
+                activeDrop={
+                  movingCard?.elementBelow == `${columnId}-${i + 1}` &&
+                  movingCard.drop
+                }
+                areaFull={i == listCards.length - 1}
+                onDrop={() => onDrop(columnId, i + 1)}
+              />
+            )}
           </Fragment>
         ))}
       </div>
